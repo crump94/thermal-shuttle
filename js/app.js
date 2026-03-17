@@ -22,13 +22,16 @@ const $$           = (sel, ctx = document) => ctx.querySelectorAll(sel);
 // ============================================================
 // Boot
 // ============================================================
-export const init = () => {
+export const init = async () => {
   setupNav();
   setupSearch();
   setupModal();
   setupGlobalCardHandlers();
   setupAuth();
   
+  await Auth.initAuth();
+  await Store.initStore();
+
   if (Auth.getCurrentUser()) {
     navigateTo('home');
   } else {
@@ -60,24 +63,33 @@ const setupAuth = () => {
   }
 
   if (form) {
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-password').value;
       
+      const oldBtnText = submitBtn.textContent;
+      submitBtn.textContent = 'Loading...';
+      submitBtn.disabled = true;
+
       try {
         if (isLogin) {
-          Auth.login(email, pass);
+          await Auth.login(email, pass);
+          await Store.initStore();
           showToast('Welcome back!', 'success');
         } else {
           const name = document.getElementById('auth-name').value.trim();
-          Auth.register(name, email, pass);
+          await Auth.register(name, email, pass);
+          await Store.initStore();
           showToast('Account created successfully!', 'success');
         }
         form.reset();
         navigateTo('home');
       } catch (err) {
-        showToast(err.message, 'error');
+        showToast(err.message || 'Authentication failed.', 'error');
+      } finally {
+        submitBtn.textContent = oldBtnText;
+        submitBtn.disabled = false;
       }
     });
   }
@@ -281,14 +293,16 @@ const renderProfile = async () => {
   }
 
   // Bind Actions
-  $('#btn-logout').onclick = () => {
-    Auth.logout();
+  $('#btn-logout').onclick = async () => {
+    Store.clearCache();
+    await Auth.logout();
     navigateTo('auth');
     showToast('Logged out successfully.');
   };
-  $('#btn-delete-account').onclick = () => {
+  $('#btn-delete-account').onclick = async () => {
     if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
-      Auth.deleteAccount();
+      Store.clearCache();
+      await Auth.deleteAccount();
       navigateTo('auth');
       showToast('Account deleted.');
     }

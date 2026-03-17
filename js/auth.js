@@ -1,58 +1,70 @@
 // ============================================================
-// Auth System — localStorage mock authentication
+// Auth System — Supabase Integration
 // ============================================================
+import { supabase } from './supabase.js';
 
-const NS = 'moviesdb_';
+let currentUser = null;
 
-const getUsers = () => {
-  try { return JSON.parse(localStorage.getItem(NS + 'users')) || {}; }
-  catch { return {}; }
-};
-
-const saveUsers = (users) => localStorage.setItem(NS + 'users', JSON.stringify(users));
-
-export const getCurrentUser = () => {
-  const email = localStorage.getItem(NS + 'currentUser');
-  if (!email) return null;
-  const users = getUsers();
-  return users[email] || null;
-};
-
-export const register = (name, email, password) => {
-  const users = getUsers();
-  if (users[email]) {
-    throw new Error('An account with this email already exists.');
+// Initialize session state on load
+export const initAuth = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    currentUser = {
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.user_metadata?.full_name || 'My CineVault'
+    };
   }
-  users[email] = { name, email, password };
-  saveUsers(users);
-  localStorage.setItem(NS + 'currentUser', email);
-  return users[email];
+  
+  // Listen for changes (login, logout)
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.user_metadata?.full_name || 'My CineVault'
+      };
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+    }
+  });
+
+  return currentUser;
 };
 
-export const login = (email, password) => {
-  const users = getUsers();
-  const user = users[email];
-  if (!user || user.password !== password) {
-    throw new Error('Invalid email or password.');
-  }
-  localStorage.setItem(NS + 'currentUser', email);
-  return user;
+export const getCurrentUser = () => currentUser;
+
+export const register = async (name, email, password) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: name }
+    }
+  });
+  if (error) throw error;
+  return data;
 };
 
-export const logout = () => {
-  localStorage.removeItem(NS + 'currentUser');
+export const login = async (email, password) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+  if (error) throw error;
+  return data;
 };
 
-export const deleteAccount = () => {
-  const email = localStorage.getItem(NS + 'currentUser');
-  if (email) {
-    const users = getUsers();
-    delete users[email];
-    saveUsers(users);
-    localStorage.removeItem(NS + 'currentUser');
-    
-    // Clean up user data
-    localStorage.removeItem(`${NS}${email}_watched`);
-    localStorage.removeItem(`${NS}${email}_watchlist`);
-  }
+export const logout = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
+  currentUser = null;
+};
+
+export const deleteAccount = async () => {
+  // Note: Supabase restricts client-side account deletion for security reasons by default.
+  // In a real app, you would call an Edge Function or your backend to delete the user.
+  // For this static app, we'll log them out and inform them.
+  await logout();
+  alert("For security reasons, Supabase requires you to contact support or use a secure backend endpoint to fully delete your account. You have been logged out.");
 };
