@@ -433,6 +433,7 @@ a { text-decoration: none; color: inherit; }
 }
 .profile-meta h2 { font-size: 1.6rem; font-weight: 800; }
 .profile-meta p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+.profile-actions { margin-top: 24px; width: 100%; display: flex; gap: 12px; flex-wrap: wrap; }
 
 .profile-stats {
   display: flex;
