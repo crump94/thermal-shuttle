@@ -47,6 +47,36 @@
   ====================================================== -->
   <main class="main">
 
+    <!-- ==================== AUTHENTICATION VIEW ==================== -->
+    <section id="view-auth" class="view">
+      <div class="auth-container">
+        <div class="auth-box">
+          <div class="auth-logo">🎬 CineVault</div>
+          <h2 id="auth-title">Sign In</h2>
+          <p id="auth-subtitle">Welcome back! Please enter your details.</p>
+          <form id="auth-form">
+            <div class="input-group" id="auth-name-group" style="display:none;">
+              <label for="auth-name">Full Name</label>
+              <input type="text" id="auth-name" placeholder="John Doe" autocomplete="name" />
+            </div>
+            <div class="input-group">
+              <label for="auth-email">Email Address</label>
+              <input type="email" id="auth-email" placeholder="hello@example.com" required autocomplete="email" />
+            </div>
+            <div class="input-group">
+              <label for="auth-password">Password</label>
+              <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" id="auth-submit-btn">Sign In</button>
+            <p class="auth-switch">
+              <span id="auth-switch-text">Don't have an account?</span>
+              <a href="#" id="auth-switch-link">Sign Up</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== HOME VIEW ==================== -->
     <section id="view-home" class="view active">
 
@@ -102,8 +132,8 @@
       <div class="profile-header">
         <div class="profile-avatar">🎬</div>
         <div class="profile-meta">
-          <h2>My CineVault</h2>
-          <p>Your personal movie universe</p>
+          <h2 id="profile-name-display">My CineVault</h2>
+          <p id="profile-email-display">Loading...</p>
           <div class="profile-stats">
             <div class="stat-card">
               <div class="stat-val" id="profile-watched-count">0</div>
@@ -117,6 +147,10 @@
               <div class="stat-val" id="profile-rating-avg">—</div>
               <div class="stat-label">Avg Rating</div>
             </div>
+          </div>
+          <div class="profile-actions">
+            <button id="btn-logout" class="btn btn-outline">Logout</button>
+            <button id="btn-delete-account" class="btn btn-danger">Delete Account</button>
           </div>
         </div>
       </div>

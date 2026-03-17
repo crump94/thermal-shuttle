@@ -4,6 +4,7 @@
 
 import * as API  from './api.js';
 import * as Store from './store.js';
+import * as Auth from './auth.js';
 import { renderMovieCard, renderSkeletons, renderStars, showToast, icons, escHtml } from './ui.js';
 import { getRecommendations } from './recommendations.js';
 
@@ -26,17 +27,77 @@ export const init = () => {
   setupSearch();
   setupModal();
   setupGlobalCardHandlers();
-  navigateTo('home');
+  setupAuth();
+  
+  if (Auth.getCurrentUser()) {
+    navigateTo('home');
+  } else {
+    navigateTo('auth');
+  }
+};
+
+const setupAuth = () => {
+  const form = document.getElementById('auth-form');
+  const switchLink = document.getElementById('auth-switch-link');
+  const switchText = document.getElementById('auth-switch-text');
+  const nameGroup = document.getElementById('auth-name-group');
+  const title = document.getElementById('auth-title');
+  const submitBtn = document.getElementById('auth-submit-btn');
+  let isLogin = true;
+
+  if (switchLink) {
+    switchLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      isLogin = !isLogin;
+      title.textContent = isLogin ? 'Sign In' : 'Create Account';
+      switchText.textContent = isLogin ? "Don't have an account?" : "Already have an account?";
+      switchLink.textContent = isLogin ? 'Sign Up' : 'Sign In';
+      submitBtn.textContent = isLogin ? 'Sign In' : 'Create Account';
+      nameGroup.style.display = isLogin ? 'none' : 'block';
+      if (!isLogin) document.getElementById('auth-name').setAttribute('required', 'true');
+      else document.getElementById('auth-name').removeAttribute('required');
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const pass = document.getElementById('auth-password').value;
+      
+      try {
+        if (isLogin) {
+          Auth.login(email, pass);
+          showToast('Welcome back!', 'success');
+        } else {
+          const name = document.getElementById('auth-name').value.trim();
+          Auth.register(name, email, pass);
+          showToast('Account created successfully!', 'success');
+        }
+        form.reset();
+        navigateTo('home');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+  }
 };
 
 // ============================================================
 // Navigation
 // ============================================================
 const navigateTo = (view, params = {}) => {
+  if (view !== 'auth' && !Auth.getCurrentUser()) {
+    view = 'auth';
+  }
+
   currentView = view;
   views().forEach(v => v.classList.remove('active'));
   const el = document.getElementById(`view-${view}`);
   if (el) el.classList.add('active');
+
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.style.display = view === 'auth' ? 'none' : 'flex';
 
   $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.view === view));
 
@@ -206,6 +267,32 @@ const renderProfile = async () => {
   const watchedGrid = $('#watched-grid');
   const watchlistGrid = $('#watchlist-grid');
   const recsGrid = $('#recs-grid');
+
+  const user = Auth.getCurrentUser();
+  if (user) {
+    const nameDisplay = $('#profile-name-display');
+    const emailDisplay = $('#profile-email-display');
+    if (nameDisplay) nameDisplay.textContent = user.name || 'My CineVault';
+    if (emailDisplay) {
+      const parts = user.email.split('@');
+      const hiddenEmail = parts[0].charAt(0) + '*'.repeat(parts[0].length - 1) + '@' + parts[1];
+      emailDisplay.textContent = hiddenEmail;
+    }
+  }
+
+  // Bind Actions
+  $('#btn-logout').onclick = () => {
+    Auth.logout();
+    navigateTo('auth');
+    showToast('Logged out successfully.');
+  };
+  $('#btn-delete-account').onclick = () => {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      Auth.deleteAccount();
+      navigateTo('auth');
+      showToast('Account deleted.');
+    }
+  };
 
   // Counts
   const watched   = Object.values(Store.getWatched());

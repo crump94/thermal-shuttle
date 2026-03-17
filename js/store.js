@@ -2,13 +2,20 @@
 // User Data Store — localStorage persistence
 // ============================================================
 
+import { getCurrentUser } from './auth.js';
+
 const NS = 'moviesdb_';
 
+const getUserPrefix = () => {
+  const user = getCurrentUser();
+  return user ? user.email + '_' : '';
+};
+
 const load = (key) => {
-  try { return JSON.parse(localStorage.getItem(NS + key)) || {}; }
+  try { return JSON.parse(localStorage.getItem(NS + getUserPrefix() + key)) || {}; }
   catch { return {}; }
 };
-const save = (key, val) => localStorage.setItem(NS + key, JSON.stringify(val));
+const save = (key, val) => localStorage.setItem(NS + getUserPrefix() + key, JSON.stringify(val));
 
 // ---- Watched ------------------------------------------------
 export const getWatched = () => load('watched');
