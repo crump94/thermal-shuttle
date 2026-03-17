@@ -2,22 +2,22 @@
 // Main App Controller
 // ============================================================
 
-import * as API  from './api.js';
+import * as API from './api.js';
 import * as Store from './store.js';
 import * as Auth from './auth.js';
 import { renderMovieCard, renderSkeletons, renderStars, showToast, icons, escHtml } from './ui.js';
 import { getRecommendations } from './recommendations.js';
 
 // ---- State -------------------------------------------------
-let currentView  = 'home';
+let currentView = 'home';
 let searchDebounce;
-let modalMovie   = null;
+let modalMovie = null;
 const movieCache = new Map(); // id → movie object
 
 // ---- DOM refs ----------------------------------------------
-const views       = () => document.querySelectorAll('.view');
-const $            = (sel, ctx = document) => ctx.querySelector(sel);
-const $$           = (sel, ctx = document) => ctx.querySelectorAll(sel);
+const views = () => document.querySelectorAll('.view');
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
 // ============================================================
 // Boot
@@ -28,7 +28,7 @@ export const init = async () => {
   setupModal();
   setupGlobalCardHandlers();
   setupAuth();
-  
+
   await Auth.initAuth();
   await Store.initStore();
 
@@ -67,7 +67,7 @@ const setupAuth = () => {
       e.preventDefault();
       const email = document.getElementById('auth-email').value.trim();
       const pass = document.getElementById('auth-password').value;
-      
+
       const oldBtnText = submitBtn.textContent;
       submitBtn.textContent = 'Loading...';
       submitBtn.disabled = true;
@@ -113,8 +113,8 @@ const navigateTo = (view, params = {}) => {
 
   $$('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.view === view));
 
-  if (view === 'home')    renderHome();
-  if (view === 'search')  renderSearch(params.q || '');
+  if (view === 'home') renderHome();
+  if (view === 'search') renderSearch(params.q || '');
   if (view === 'profile') renderProfile();
 };
 
@@ -131,9 +131,9 @@ const setupNav = () => {
 // Home View
 // ============================================================
 const renderHome = async () => {
-  const trendingGrid  = $('#trending-grid');
-  const nowGrid       = $('#now-playing-grid');
-  const heroSection   = $('#hero-section');
+  const trendingGrid = $('#trending-grid');
+  const nowGrid = $('#now-playing-grid');
+  const heroSection = $('#hero-section');
 
   renderSkeletons(8, trendingGrid);
   renderSkeletons(8, nowGrid);
@@ -309,14 +309,14 @@ const renderProfile = async () => {
   };
 
   // Counts
-  const watched   = Object.values(Store.getWatched());
+  const watched = Object.values(Store.getWatched());
   const watchlist = Object.values(Store.getWatchlist());
 
   $('#profile-watched-count')?.textContent != null && ($('#profile-watched-count').textContent = watched.length);
   $('#profile-wl-count')?.textContent != null && ($('#profile-wl-count').textContent = watchlist.length);
   $('#profile-rating-avg')?.textContent != null && (() => {
     const rated = watched.filter(m => m.rating > 0);
-    const avg   = rated.length ? (rated.reduce((s, m) => s + m.rating, 0) / rated.length).toFixed(1) : '—';
+    const avg = rated.length ? (rated.reduce((s, m) => s + m.rating, 0) / rated.length).toFixed(1) : '—';
     $('#profile-rating-avg').textContent = avg;
   })();
 
@@ -385,7 +385,7 @@ const renderProfile = async () => {
 // Movie Detail Modal
 // ============================================================
 const setupModal = () => {
-  const modal   = $('#movie-modal');
+  const modal = $('#movie-modal');
   const overlay = $('#modal-overlay');
   if (!modal) return;
 
@@ -396,7 +396,7 @@ const setupModal = () => {
 
 export const openModal = async (id) => {
   const modal = $('#movie-modal');
-  const body  = $('#modal-body');
+  const body = $('#modal-body');
   if (!modal || !body) return;
 
   body.innerHTML = `<div class="modal-loading">${renderSpinner()}</div>`;
@@ -425,8 +425,8 @@ const closeModal = () => {
 };
 
 const renderModalContent = (movie, credits, container) => {
-  const watched   = Store.isWatched(movie.id);
-  const wl        = Store.isWatchlisted(movie.id);
+  const watched = Store.isWatched(movie.id);
+  const wl = Store.isWatchlisted(movie.id);
   const userRating = watched ? (Store.getWatched()[movie.id]?.rating || 0) : 0;
 
   const backdrop = movie.backdrop_path
@@ -439,9 +439,9 @@ const renderModalContent = (movie, credits, container) => {
 
   const genres = (movie.genres || []).map(g => `<span class="genre-chip">${g.name}</span>`).join('');
   const runtime = movie.runtime ? `${Math.floor(movie.runtime / 60)}h ${movie.runtime % 60}m` : '';
-  const year    = movie.release_date?.slice(0, 4) || '';
-  const rating  = movie.vote_average?.toFixed(1) || '';
-  const cast    = (credits.cast || []).slice(0, 8).map(c => `
+  const year = movie.release_date?.slice(0, 4) || '';
+  const rating = movie.vote_average?.toFixed(1) || '';
+  const cast = (credits.cast || []).slice(0, 8).map(c => `
     <div class="cast-card">
       <img src="${c.profile_path ? API.IMG_SMALL + c.profile_path : 'data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'80\' height=\'80\' viewBox=\'0 0 80 80\'><rect fill=\'%231e1e3a\' width=\'80\' height=\'80\' rx=\'40\'/><text fill=\'%236b6baa\' font-size=\'32\' x=\'50%25\' y=\'55%25\' text-anchor=\'middle\' dominant-baseline=\'middle\'>👤</text></svg>'}" alt="${escHtml(c.name)}" loading="lazy"/>
       <p class="cast-name">${escHtml(c.name)}</p>
@@ -519,9 +519,9 @@ const renderSpinner = () => `<div class="spinner"></div>`;
 // Watched / Watchlist toggles
 // ============================================================
 const toggleWatchedModal = (movie, container) => {
-  const btn       = container.querySelector('#modal-watched-btn');
+  const btn = container.querySelector('#modal-watched-btn');
   const ratingWrap = container.querySelector('.modal-rating-wrap');
-  const starsEl   = container.querySelector('#modal-stars');
+  const starsEl = container.querySelector('#modal-stars');
 
   if (Store.isWatched(movie.id)) {
     Store.removeWatched(movie.id);
@@ -536,7 +536,7 @@ const toggleWatchedModal = (movie, container) => {
     ratingWrap?.classList.remove('hidden');
     if (starsEl) renderStars(starsEl, 0, (r) => {
       Store.setRating(movie.id, r);
-      renderStars(starsEl, r, () => {});
+      renderStars(starsEl, r, () => { });
       showToast(`Rated "${movie.title}" ${r} star${r !== 1 ? 's' : ''}!`);
     });
     showToast(`"${movie.title}" added to watched! Rate it below.`);
@@ -619,7 +619,7 @@ const setupGlobalCardHandlers = () => {
 // Movie cache lookup
 const getMovieFromCache = (id) => {
   if (movieCache.has(id)) return movieCache.get(id);
-  const inWatched   = Store.getWatched()[id];
+  const inWatched = Store.getWatched()[id];
   const inWatchlist = Store.getWatchlist()[id];
   return inWatched || inWatchlist || null;
 };
