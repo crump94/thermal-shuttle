@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineVault — Movie Database</title>
+  <meta name="description" content="Discover trending movies, search any film, track what you've watched, and get personalised recommendations." />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+</head>
+<body>
+
+  <!-- ======================================================
+       Top Navigation Bar
+  ====================================================== -->
+  <header class="topbar">
+    <div class="topbar-logo" id="logo-home" style="cursor:pointer">
+      <div class="logo-icon">🎬</div>
+      CineVault
+    </div>
+
+    <!-- Global Search -->
+    <div class="topbar-search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="topbar-search" type="search" placeholder="Search movies…" autocomplete="off" />
+    </div>
+
+    <!-- Nav links -->
+    <nav class="topbar-nav">
+      <a class="nav-link active" href="#" data-view="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="nav-link" href="#" data-view="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span>Discover</span>
+      </a>
+      <a class="nav-link" href="#" data-view="profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>My Profile</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- ======================================================
+       Main Content
+  ====================================================== -->
+  <main class="main">
+
+    <!-- ==================== HOME VIEW ==================== -->
+    <section id="view-home" class="view active">
+
+      <!-- Hero Banner -->
+      <div id="hero-section">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Trending This Week -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🔥 Trending This Week</h2>
+        </div>
+        <div class="movie-grid" id="trending-grid"></div>
+      </div>
+
+      <!-- Now Playing -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">🎭 Now Playing</h2>
+        </div>
+        <div class="movie-grid" id="now-playing-grid"></div>
+      </div>
+
+      <!-- Upcoming -->
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title">📅 Coming Soon</h2>
+        </div>
+        <div class="movie-grid" id="upcoming-grid"></div>
+      </div>
+
+    </section>
+
+    <!-- ==================== SEARCH / DISCOVER VIEW ==================== -->
+    <section id="view-search" class="view">
+      <div class="search-header">
+        <div class="search-big-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input id="search-input" type="search" placeholder="Search for any movie…" autocomplete="off" />
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <h2 class="section-title" id="search-heading">Popular Right Now</h2>
+        </div>
+        <div class="movie-grid" id="search-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== PROFILE VIEW ==================== -->
+    <section id="view-profile" class="view">
+      <div class="profile-header">
+        <div class="profile-avatar">🎬</div>
+        <div class="profile-meta">
+          <h2>My CineVault</h2>
+          <p>Your personal movie universe</p>
+          <div class="profile-stats">
+            <div class="stat-card">
+              <div class="stat-val" id="profile-watched-count">0</div>
+              <div class="stat-label">Watched</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" id="profile-wl-count">0</div>
+              <div class="stat-label">Watchlist</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" id="profile-rating-avg">—</div>
+              <div class="stat-label">Avg Rating</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab active" data-tab="watched">👁 Watched</button>
+        <button class="profile-tab" data-tab="watchlist">🔖 Watchlist</button>
+        <button class="profile-tab" data-tab="recs">✨ Recommendations</button>
+      </div>
+
+      <!-- Watched Panel -->
+      <div class="profile-panel active" id="panel-watched">
+        <div class="movie-grid" id="watched-grid">
+          <p class="empty-msg">You haven't marked any movies as watched yet.</p>
+        </div>
+      </div>
+
+      <!-- Watchlist Panel -->
+      <div class="profile-panel" id="panel-watchlist">
+        <div class="movie-grid" id="watchlist-grid">
+          <p class="empty-msg">Your watchlist is empty. Browse movies and save them!</p>
+        </div>
+      </div>
+
+      <!-- Recommendations Panel -->
+      <div class="profile-panel" id="panel-recs">
+        <div class="movie-grid" id="recs-grid">
+          <p class="empty-msg">Rate some movies to get personalised recommendations!</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================
+       Movie Detail Modal
+  ====================================================== -->
+  <div id="modal-overlay"></div>
+  <div id="movie-modal" role="dialog" aria-modal="true" aria-label="Movie Details">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="modal-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Bootstrap -->
+  <script type="module">
+    import { init } from './js/app.js';
+
+    // Logo click → home
+    document.getElementById('logo-home').addEventListener('click', () => {
+      import('./js/app.js').then(m => {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.view === 'home'));
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-home').classList.add('active');
+        m.init();
+      });
+    });
+
+    init();
+  </script>
+</body>
+</html>
